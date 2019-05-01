@@ -1,0 +1,29 @@
+{
+  "name": "sql-performance-counters-ui",
+  "version": "1.0.0",
+  "description": "Updatable (live) table for SQL Performance Counters data, with syntax coloring and formatting too",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oxygen/sql-performance-counters-ui.git"
+  },
+  "author": "tiberiu-ionut.stan@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oxygen/sql-performance-counters-ui/issues"
+  },
+  "homepage": "https://github.com/oxygen/sql-performance-counters-ui#readme",
+  "dependencies": {
+    "hljs": "^6.2.3",
+    "sql-formatter": "^2.3.2"
+  },
+  "files": [
+    "LICENSE",
+    "index.js",
+    "src/*",
+    "dist/*"
+  ]
+}
