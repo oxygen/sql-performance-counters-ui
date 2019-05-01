@@ -11,10 +11,9 @@ class SQLPerformanceTable
 	 */
 	constructor(strLanguage = undefined)
 	{
-		super();
-
 		this._strLanguageCode = strLanguage || navigator.language;
 
+		this._objSQLQueriesToPerformanceCounters = {};
 		this._mapSQLQueryToTableRow = new Map();
 
 		this._stCurrentSortColumnName = "fetchedRows";
@@ -22,11 +21,11 @@ class SQLPerformanceTable
 
 		this._promiseSortingSQLQueriesTable = null;
 
-		this._elTableSQLPerformanceCounters = document.createElement("table");
+		this._elTable = document.createElement("table");
 		
 		// Bootstrap specific.
-		this._elTableSQLPerformanceCounters.classList.add("table");
-		this._elTableSQLPerformanceCounters.classList.add("table-hover");
+		this._elTable.classList.add("table");
+		this._elTable.classList.add("table-hover");
 
 
 		// For destroy.
@@ -49,14 +48,14 @@ class SQLPerformanceTable
 			return;
 		}
 
-		if(this._elTableSQLPerformanceCounters)
+		if(this._elTable)
 		{
-			if(this._elTableSQLPerformanceCounters.parentNode)
+			if(this._elTable.parentNode)
 			{
-				this._elTableSQLPerformanceCounters.parentNode.removeChild(this._elTableSQLPerformanceCounters);
+				this._elTable.parentNode.removeChild(this._elTable);
 			}
 
-			this._elTableSQLPerformanceCounters = null;
+			this._elTable = null;
 		}
 
 		this._promiseSortingSQLQueriesTable = null;
@@ -77,7 +76,7 @@ class SQLPerformanceTable
 	 */
 	get table()
 	{
-		return this._elTableSQLPerformanceCounters;
+		return this._elTable;
 	}
 
 
@@ -107,7 +106,7 @@ class SQLPerformanceTable
 		
 		while(this._elTable.rows.length > 1)
 		{
-			this._elTable.deleteRow[this._elTable.rows.length - 1];
+			this._elTable.deleteRow(this._elTable.rows.length - 1);
 		}
 
 		this._objSQLQueriesToPerformanceCounters = {};
@@ -136,10 +135,10 @@ class SQLPerformanceTable
 			let elRow = this._mapSQLQueryToTableRow.get(strSQL);
 			if(!elRow)
 			{
-				elRow = this._elTableSQLPerformanceCounters.insertRow(-1);
+				elRow = this._elTable.insertRow(-1);
 				this._mapSQLQueryToTableRow.set(strSQL, elRow);
 
-				for(const strColumnName of this._arrSQLStatisticsColumns)
+				for(const strColumnName of SQLPerformanceTable.columnNames)
 				{
 					const elCell = elRow.insertCell(-1);
 
@@ -189,9 +188,9 @@ class SQLPerformanceTable
 			}
 			else
 			{
-				for(const nColumnIndex in this._arrSQLStatisticsColumns)
+				for(const nColumnIndex in SQLPerformanceTable.columnNames)
 				{
-					const elCell = elRow.cells[nColumnIndex + 1];
+					const elCell = elRow.cells.item(nColumnIndex + 1);
 
 					if(elCell)
 					{
@@ -296,16 +295,16 @@ class SQLPerformanceTable
 
 
 	/**
-	 * Adds a header row into this._elTableSQLPerformanceCounters and click event listeners for sortable columns.
+	 * Adds a header row into this._elTable and click event listeners for sortable columns.
 	 */
 	_initTable()
 	{
-		if(this._elTableSQLPerformanceCounters.rows.length)
+		if(this._elTable.rows.length)
 		{
 			return;
 		}
 
-		const elRowHeader = this._elTableSQLPerformanceCounters.insertRow(-1);
+		const elRowHeader = this._elTable.insertRow(-1);
 
 		for(const strColumnName of SQLPerformanceTable.columnNames)
 		{
@@ -403,10 +402,10 @@ SQLPerformanceTable.texts = {
 };
 
 
-SQLPerformanceTable.columnNameToTranslation["ro-RO"] = SQLPerformanceTable.columnNameToTranslation.ro;
-SQLPerformanceTable.columnNameToTranslation["ro-MD"] = SQLPerformanceTable.columnNameToTranslation.ro;
-SQLPerformanceTable.columnNameToTranslation["en-US"] = SQLPerformanceTable.columnNameToTranslation.en;
-SQLPerformanceTable.columnNameToTranslation["en-UK"] = SQLPerformanceTable.columnNameToTranslation.en;
+SQLPerformanceTable.texts["ro-RO"] = SQLPerformanceTable.texts.ro;
+SQLPerformanceTable.texts["ro-MD"] = SQLPerformanceTable.texts.ro;
+SQLPerformanceTable.texts["en-US"] = SQLPerformanceTable.texts.en;
+SQLPerformanceTable.texts["en-UK"] = SQLPerformanceTable.texts.en;
 
 
 module.exports = SQLPerformanceTable;
