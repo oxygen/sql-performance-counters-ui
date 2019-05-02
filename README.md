@@ -32,6 +32,9 @@ npm i sql-performance-counters-ui
 	// The SQLPerformanceTable class is available globally on the window object.
 	new SQLPerformanceTable();
 </script>
+
+Both `hljs` (highlight.js) and `sqlFormatter` (sql-formatter) are optional wether using a build system or not.
+When using a build system they can be excluded from the build (Webpack externals) and all will work fine without them.
 ```
 
 

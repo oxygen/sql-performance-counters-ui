@@ -16,7 +16,7 @@ class SQLPerformanceTable
 		this._objSQLQueriesToPerformanceCounters = {};
 		this._mapSQLQueryToTableRow = new Map();
 
-		this._stCurrentSortColumnName = "fetchedRows";
+		this._strCurrentSortColumnName = "fetchedRows";
 		this._strCurrentSortDirection = "DESC";
 
 		this._promiseSortingSQLQueriesTable = null;
@@ -147,42 +147,64 @@ class SQLPerformanceTable
 						const elCodeSQL = document.createElement("code");
 						elCodeSQL.innerText = strSQL;
 
+						
 						const elCodeSQLFormatted = document.createElement("code");
-						elCodeSQLFormatted.innerText = sqlFormatter.format(strSQL);
+						
+						// When not using a build system, maybe sqlFormatter is not available on the global namespace (window).
+						if(sqlFormatter)
+						{
+							elCodeSQLFormatted.innerText = sqlFormatter.format(strSQL);
+						}
 						elCodeSQLFormatted.style.whiteSpace = "pre-wrap";
 						
-						hljs.highlightBlock(elCodeSQL);
-						hljs.highlightBlock(elCodeSQLFormatted);
+
+						// When not using a build system, maybe hljs is not available on the global namespace (window).
+						if(hljs)
+						{
+							hljs.highlightBlock(elCodeSQL);
+							hljs.highlightBlock(elCodeSQLFormatted);
+						}
 						
 						elCell.appendChild(elCodeSQL);
 						elCell.appendChild(elCodeSQLFormatted);
 
 						elCodeSQLFormatted.style.display = "none";
 
-						elCell.style.cursor = "pointer";
-						const fnOnClick = (() => {
-							if(elCodeSQLFormatted.style.display === "none")
-							{
-								elCodeSQLFormatted.style.display = "";
-								elCodeSQL.style.display = "none";
-							}
-							else
-							{
-								elCodeSQLFormatted.style.display = "none";
-								elCodeSQL.style.display = "";
-							}
-						}).bind(this);
-						elCodeSQL.addEventListener("click", fnOnClick);
-						this._arrDisposeCallsTableRows.push(() => { elCodeSQL.removeEventListener("click", fnOnClick); });
-						elCodeSQLFormatted.addEventListener("click", fnOnClick);
-						this._arrDisposeCallsTableRows.push(() => { elCodeSQLFormatted.removeEventListener("click", fnOnClick); });
+						// When not using a build system, maybe sqlFormatter is not available on the global namespace (window).
+						if(sqlFormatter)
+						{
+							elCell.style.cursor = "pointer";
+							const fnOnClick = (() => {
+								if(elCodeSQLFormatted.style.display === "none")
+								{
+									elCodeSQLFormatted.style.display = "";
+									elCodeSQL.style.display = "none";
+								}
+								else
+								{
+									elCodeSQLFormatted.style.display = "none";
+									elCodeSQL.style.display = "";
+								}
+							}).bind(this);
+							elCodeSQL.addEventListener("click", fnOnClick);
+							this._arrDisposeCallsTableRows.push(() => { elCodeSQL.removeEventListener("click", fnOnClick); });
+							elCodeSQLFormatted.addEventListener("click", fnOnClick);
+							this._arrDisposeCallsTableRows.push(() => { elCodeSQLFormatted.removeEventListener("click", fnOnClick); });
+						}
 					}
 					else
 					{
-						elCell.innerText = this._renderValue(strColumnName, this._objSQLQueriesToPerformanceCounters[strSQL]);
-						elCell.title = strColumnName;
-						elCell.style.textAlign = "right";
-						elCell.style.whiteSpace = "pre";
+						if(this._objSQLQueriesToPerformanceCounters[strSQL])
+						{
+							elCell.innerText = this._renderValue(strColumnName, this._objSQLQueriesToPerformanceCounters[strSQL]);
+							elCell.title = strColumnName;
+							elCell.style.textAlign = "right";
+							elCell.style.whiteSpace = "pre";
+						}
+						else
+						{
+							// console.error(`${strSQL} no longer set in this._objSQLQueriesToPerformanceCounters`);
+						}
 					}
 				}
 			}
@@ -194,13 +216,20 @@ class SQLPerformanceTable
 
 					if(elCell)
 					{
-						elCell.innerText = this._renderValue(/*strColumnName*/ elCell.title, objSQLToPerformanceCounters[strSQL]);
+						if(objSQLToPerformanceCounters[strSQL])
+						{
+							elCell.innerText = this._renderValue(/*strColumnName*/ elCell.title, objSQLToPerformanceCounters[strSQL]);
+						}
+						else
+						{
+							// console.error(`${strSQL} no longer set in this._objSQLQueriesToPerformanceCounters`);
+						}
 					}
 				}
 			}
 		}
 
-		this.sort(this._stCurrentSortColumnName, this._strCurrentSortDirection);
+		this.sort(this._strCurrentSortColumnName, this._strCurrentSortDirection);
 	}
 
 
@@ -212,16 +241,7 @@ class SQLPerformanceTable
 	 */
 	sort(strColumnName = "fetchedRows", strSortDirection = "DESC")
 	{
-		if(
-			strColumnName === this._stCurrentSortColumnName
-			&& strSortDirection === this._strCurrentSortDirection
-		)
-		{
-			return;
-		}
-
-
-		this._stCurrentSortColumnName = strColumnName;
+		this._strCurrentSortColumnName = strColumnName;
 		this._strCurrentSortDirection = strSortDirection;
 
 
@@ -260,12 +280,12 @@ class SQLPerformanceTable
 				}
 				else
 				{
-					console.error(`Could not find table row for ${strSQL} when sorting.`);
+					// console.error(`Could not find table row for ${strSQL} when sorting.`);
 				}
 			}
 			else
 			{
-				console.error(`Could not find SQL for performance counters object ${JSON.stringify(objPerformanceCounters)}`);
+				// console.error(`Could not find SQL for performance counters object ${JSON.stringify(objPerformanceCounters)}`);
 			}
 		}
 	}
@@ -319,7 +339,7 @@ class SQLPerformanceTable
 
 				const fnOnClick = (async() => {
 					let strSortDirection;
-					if(this._stCurrentSortColumnName === strColumnName)
+					if(this._strCurrentSortColumnName === strColumnName)
 					{
 						strSortDirection = this._strCurrentSortDirection === "DESC" ? "ASC" : "DESC";
 					}
@@ -328,7 +348,7 @@ class SQLPerformanceTable
 						strSortDirection = "DESC";
 					}
 
-					this.sort(strColumnName, strSortDirection).catch(console.error);
+					this.sort(strColumnName, strSortDirection);
 				}).bind(this);
 	
 				elCell.addEventListener("click", fnOnClick);
