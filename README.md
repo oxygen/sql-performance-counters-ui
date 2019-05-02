@@ -65,6 +65,6 @@ setInterval(
 );
 
 
-// When the table isn't needed anymore, call the destructor to remove event listeners, references and the HTMLTable element fro the DOM.
+// When the table isn't needed anymore, call the destructor to remove event listeners, references and remove the HTMLTable element from the DOM.
 sqlPerformanceTable.destroy();
 ```
