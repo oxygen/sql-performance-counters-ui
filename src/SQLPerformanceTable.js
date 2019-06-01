@@ -192,6 +192,44 @@ class SQLPerformanceTable
 							this._arrDisposeCallsTableRows.push(() => { elCodeSQLFormatted.removeEventListener("click", fnOnClick); });
 						}
 					}
+					else if(strColumnName === "copyToClipboard")
+					{
+						if(navigator && navigator.clipboard && navigator.clipboard.writeText)
+						{
+							const elAnchorCopyToClipboard = document.createElement("a");
+							elAnchorCopyToClipboard.innerHTML = /*html*/`&#x1f4cb;`;
+							elAnchorCopyToClipboard.title = this.texts.copyToClipboard;
+							elAnchorCopyToClipboard.href = "javascript:void(0)";
+							const fnOnClick = (async() => {
+								let strSQLForClipboard = strSQL;
+								if(sqlFormatter)
+								{
+									try
+									{
+										strSQLForClipboard = sqlFormatter.format(strSQL)
+									}
+									catch(error)
+									{
+										console.error(error);
+									}
+								}
+
+								try
+								{
+									await navigator.clipboard.writeText(strSQLForClipboard);
+								}
+								catch(error)
+								{
+									alert(error.message);
+								}
+							}).bind(this);
+
+							elAnchorCopyToClipboard.addEventListener("click", fnOnClick);
+							this._arrDisposeCallsTableRows.push(() => { elAnchorCopyToClipboard.removeEventListener("click", fnOnClick); });
+
+							elCell.appendChild(elAnchorCopyToClipboard);
+						}
+					}
 					else
 					{
 						if(this._objSQLQueriesToPerformanceCounters[strSQL])
@@ -212,7 +250,12 @@ class SQLPerformanceTable
 			{
 				for(const nColumnIndex in SQLPerformanceTable.columnNames)
 				{
-					const elCell = elRow.cells.item(nColumnIndex + 1);
+					if(nColumnIndex < (/*sql*/ 1 + /*copy to clipboard*/ 1))
+					{
+						continue;
+					}
+					
+					const elCell = elRow.cells.item(nColumnIndex);
 
 					if(elCell)
 					{
@@ -333,7 +376,16 @@ class SQLPerformanceTable
 			elCell.title = strColumnName;
 			elCell.style.fontWeight = "bold";
 
-			if(strColumnName !== "query")
+			if(strColumnName === "query")
+			{
+				// It doesn't make sense to sort based on the query.
+			}
+			else if(strColumnName === "copyToClipboard")
+			{
+				// It doesn't make sense to sort based on the clipboard button.
+				elCell.textContent = "";
+			}
+			else
 			{
 				elCell.style.cursor = "pointer";
 
@@ -362,6 +414,7 @@ class SQLPerformanceTable
 // Except for "query", all other column names are sortable, see SQLPerformanceTable.sort().
 SQLPerformanceTable.columnNames = [
 	"query", 
+	"copyToClipboard",
 	"fetchedRows", 
 	"affectedRows", 
 	"changedRows",
@@ -395,7 +448,9 @@ SQLPerformanceTable.texts = {
 		secondShort: "sec",
 		secondsShort: "sec",
 		millisecondShort: "ms",
-		millisecondsShort: "ms"
+		millisecondsShort: "ms",
+
+		copyToClipboard: "Copy to clipboard"
 	},
 
 	ro: {
@@ -417,7 +472,9 @@ SQLPerformanceTable.texts = {
 		secondShort: "sec",
 		secondsShort: "sec",
 		millisecondShort: "ms",
-		millisecondsShort: "ms"
+		millisecondsShort: "ms",
+
+		copyToClipboard: "Copiază în clipboard"
 	}
 };
 
