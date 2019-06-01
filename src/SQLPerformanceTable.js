@@ -387,6 +387,7 @@ class SQLPerformanceTable
 			}
 			else
 			{
+				elCell.style.textAlign = "right";
 				elCell.style.cursor = "pointer";
 
 				const fnOnClick = (async() => {

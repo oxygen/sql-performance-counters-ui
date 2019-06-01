@@ -1,6 +1,6 @@
 {
   "name": "sql-performance-counters-ui",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Updatable (live) table for SQL Performance Counters data, with syntax coloring and formatting too",
   "main": "index.js",
   "scripts": {
